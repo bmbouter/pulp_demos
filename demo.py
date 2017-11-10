@@ -1,5 +1,6 @@
 import argparse
 import csv
+import time
 
 
 """
@@ -33,8 +34,9 @@ Note the optional fourth argument with the version of Pulp affected.
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Process community demo data.')
-    parser.add_argument('--filename', help='filename with the data', required=True)
-    parser.add_argument('--author', default='Brian Bouterse', help='the author of the announcements')
+    parser.add_argument('--filename', help='Filename with the data', required=True)
+    parser.add_argument('--date', help='The date the demo occured', default=time.strftime("%b %d, %Y"))
+    parser.add_argument('--author', default='Brian Bouterse', help='The author of the announcements')
     return parser.parse_args()
 
 
@@ -69,7 +71,7 @@ def main():
 
 def parse_data(args):
     demos = []
-    with open(args.filename, newline='') as csvfile:
+    with open(args.filename) as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
         youtube_link = None
         for row in spamreader:
@@ -100,7 +102,7 @@ def display_pulp_list_email(args, youtube_slug, demos):
 
 --------------------   email   ---------------------
 
-This was recorded today, and the video is available on the Pulp YouTube Channel [0] and on the Pulp blog [1].
+The Pulp Community Demo video is available on the Pulp YouTube Channel [0] and on the Pulp blog [1].
 
 
 Sections from the demo:
@@ -123,15 +125,15 @@ def display_blog_post(args, youtube_slug, demos):
 --------------------   blog   ---------------------
 
 ---
-title: Sprint {sprint} Demo
+title: Community Demo {date}
 author: {author}
 tags:
   - demo
 ---
-The Sprint {sprint} Demo is available on the [Pulp YouTube Channel](https://www.youtube.com/channel/UCI43Ffs4VPDv7awXvvBJfRQ). See the agenda below.
+The Community Demo is available on the [Pulp YouTube Channel](https://www.youtube.com/channel/UCI43Ffs4VPDv7awXvvBJfRQ). See the agenda below.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/{youtube_slug}" frameborder="0" allowfullscreen></iframe>
-""".format(youtube_slug=youtube_slug, sprint=args.sprint, author=args.author))
+""".format(youtube_slug=youtube_slug, date=args.date, author=args.author))
 
     for demo in demos:
         print("""[{title} ({nick}){version_str}](http://www.youtube.com/watch?v={youtube_slug}&t={time})
