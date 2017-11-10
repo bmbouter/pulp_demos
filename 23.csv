@@ -1,0 +1,11 @@
+https://www.youtube.com/watch?v=RtLwGFDv8LQ
+State of Pulp,mhrivnak,0:29
+Community Update,bmbouter,3:35
+Skip download of docker blobs with foreign mediatype,ipanova,6:00
+User will be able to upload Docker V2 Schema 2 image saved using skopeo,mansari,9:03
+QE testing confirms that user can migrate from 2.11.z on RHEL6 --> 2.13.z on RHEL7,elijah_d,12:37
+pep8speaks,daviddavis,18:11
+Status api in pulp 3,daviddavis,19:30
+Content creation REST API in pulp 3,dkliban,21:13
+Download API prototypes based on asyncio,bmbouter,25:15
+--base-dir option for checkout.py,bmbouter,28:58

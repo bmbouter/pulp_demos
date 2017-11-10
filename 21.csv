@@ -1,0 +1,10 @@
+https://www.youtube.com/watch?v=0T84sdEfBWE
+State of Pulp,mhrivnak,0:15
+Community Update,bmbouter,4:32
+Debian Content Support for Pulp 2,misa,7:42,2.14
+Napoleon style docstrings,asmacdo,11:48,3.0
+Docs building check for pull requests on github,bizhang,13:59
+Generate random SECRET_KEY for Django as part of setup workflow,bizhang,15:21,3.0
+Asynchronous updates of importer,dkliban,16:14,3.0
+File importer using the ChangeSet provided by the plugin API,jortel,19:40,3.0
+Side by side Pulp2/Pulp3 dev installs,asmacdo,33:38
