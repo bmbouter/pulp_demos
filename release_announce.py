@@ -1,3 +1,20 @@
+"""
+This module will produce an announcement email and blog post that is ready for sending.
+
+It uses a query on pulp.plan.io to identify the issues in the release. This is required because the
+python-redmine client doesn't support filtering so another approach would require a full search of
+issues each time.
+
+Run it in a virtualenv and install the requirements file with something like:
+
+python3 -m venv announce_env
+source announce_env/bin/activate
+pip install -r requirements.txt
+python3 release_announce.py --help
+
+See the --help for more info on the arguments.
+"""
+
 import argparse
 from collections import defaultdict
 import os
