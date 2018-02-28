@@ -34,6 +34,47 @@ Issues Addressed
 
 """
 
+
+BLOG_POST_TEMPLATE = """
+---
+title: Pulp {full_version} Generally Available
+author: {author}
+tags:
+  - release
+---
+
+Pulp {full_version} is now Generally Available in the stable repositories:
+
+* [pulp-2-stable](https://repos.fedorapeople.org/pulp/pulp/stable/2/)
+* [pulp-stable](https://repos.fedorapeople.org/pulp/pulp/stable/latest/)
+
+This release includes bug fixes for {projects}.
+
+## Upgrading
+
+The Pulp 2 stable repositories are included in the pulp repo files:
+
+- [Fedora](https://repos.fedorapeople.org/repos/pulp/pulp/fedora-pulp.repo)
+- [RHEL 7](https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo)
+
+After enabling the pulp-stable or pulp-2-stable repository, you'll want to follow the standard
+upgrade path with migrations:
+
+```sh
+$ sudo systemctl stop httpd pulp_workers pulp_resource_manager pulp_celerybeat pulp_streamer goferd
+$ sudo yum upgrade
+$ sudo -u apache pulp-manage-db
+$ sudo systemctl start httpd pulp_workers pulp_resource_manager pulp_celerybeat pulp_streamer goferd
+```
+
+The `pulp_streamer` and `goferd` services should be omitted if those services are not installed.
+
+
+## Issues Addressed
+{issue_str}
+"""
+
+
 REDMINE_URL = 'https://pulp.plan.io'
 
 
@@ -46,11 +87,12 @@ def x_y_z_version(version):
 def parse_args():
     parser = argparse.ArgumentParser(description='Create Pulp release announcements.')
     parser.add_argument('--version', type=x_y_z_version, help='The x.y.z version to create release notes for', required=True)
+    parser.add_argument('--author', help='The full name of the author used in the blogpost.', required=True)
     parser.add_argument('--query-num', help='The number in the URL on Redmine that shows all issues for this release', type=int, required=True)
     return parser.parse_args()
 
 
-def print_release_notes(args):
+def print_announcements(args):
     redmine = Redmine(REDMINE_URL, key=os.environ['REDMINE_KEY'])
     issues = [issue for issue in redmine.issue.filter(query_id=args.query_num)]
     issues_by_project = defaultdict(list)
@@ -70,10 +112,22 @@ def print_release_notes(args):
                                       full_version=args.version, x_y_version=x_y_version)
     print(email_msg)
 
+    print('---------------------------------------------------\n')
+
+    template_issue_str = ''
+    for project_name in projects:
+        template_issue_str += '\n### ' + project_name + '\n'
+        for issue in issues_by_project[project_name]:
+            template_issue_str += '- {num}\t{subject}\n'.format(num=issue.id, subject=issue.subject)
+    blog_msg = BLOG_POST_TEMPLATE.format(issue_str=template_issue_str, projects=project_str,
+                                         full_version=args.version, author=args.author)
+
+    print(blog_msg)
+
 
 def main():
     args = parse_args()
-    print_release_notes(args)
+    print_announcements(args)
 
 
 if __name__ == "__main__":
