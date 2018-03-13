@@ -1,5 +1,5 @@
 """
-This module will produce an announcement email and blog post that is ready for sending.
+This module will produces various announcements for announcing Pulp GA and Beta releases.
 
 It uses a query on pulp.plan.io to identify the issues in the release. This is required because the
 python-redmine client doesn't support filtering so another approach would require a full search of
@@ -23,20 +23,21 @@ from redminelib import Redmine
 
 
 EMAIL_TEMPLATE = """
-Pulp {full_version} is now generally available, and can be downloaded from the {x_y_version} stable repositories:
+Pulp {full_version}{beta_name_number} is now available, and can be downloaded from the {x_y_version} {beta_or_stable} repositories:
 
-https://repos.fedorapeople.org/repos/pulp/pulp/stable/{x_y_version}/
+https://repos.fedorapeople.org/repos/pulp/pulp/{beta_or_stable}/{x_y_version}/
 
-This release includes a small number bug fixes for: {projects}
+This release includes {features_or_fixes} for: {projects}
 
 Upgrading
 =========
 
-The Pulp {x_y_version} stable repository is included in the pulp repo files:
+The Pulp {x_y_version} {beta_or_stable} repository is included in the pulp repo files:
     https://repos.fedorapeople.org/repos/pulp/pulp/fedora-pulp.repo for Fedora
     https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo for RHEL 7
 
-After enabling the pulp-stable repository, you'll want to follow the standard upgrade path with migrations:
+After enabling the pulp-{beta_or_stable} repository, you'll want to follow the standard upgrade path
+with migrations:
 
 $ sudo systemctl stop httpd pulp_workers pulp_resource_manager pulp_celerybeat pulp_streamer goferd
 $ sudo yum upgrade
@@ -54,28 +55,28 @@ Issues Addressed
 
 BLOG_POST_TEMPLATE = """
 ---
-title: Pulp {full_version} Generally Available
+title: Pulp {full_version}{beta_name_number}
 author: {author}
 tags:
   - release
 ---
 
-Pulp {full_version} is now Generally Available in the stable repositories:
+Pulp {full_version}{beta_name_number} is now available in the {beta_or_stable} repositories:
 
-* [pulp-2-stable](https://repos.fedorapeople.org/pulp/pulp/stable/2/)
-* [pulp-stable](https://repos.fedorapeople.org/pulp/pulp/stable/latest/)
+* [pulp-2-{beta_or_stable}](https://repos.fedorapeople.org/pulp/pulp/{beta_or_stable}/2/)
+* [pulp-{beta_or_stable}](https://repos.fedorapeople.org/pulp/pulp/{beta_or_stable}/latest/)
 
-This release includes bug fixes for {projects}.
+This release includes {features_or_fixes} for {projects}.
 
 ## Upgrading
 
-The Pulp 2 stable repositories are included in the pulp repo files:
+The Pulp 2 {beta_or_stable} repositories are included in the pulp repo files:
 
 - [Fedora](https://repos.fedorapeople.org/repos/pulp/pulp/fedora-pulp.repo)
 - [RHEL 7](https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo)
 
-After enabling the pulp-stable or pulp-2-stable repository, you'll want to follow the standard
-upgrade path with migrations:
+After enabling the pulp-{beta_or_stable} or pulp-2-{beta_or_stable} repository, you'll want to
+follow the standard upgrade path with migrations:
 
 ```sh
 $ sudo systemctl stop httpd pulp_workers pulp_resource_manager pulp_celerybeat pulp_streamer goferd
@@ -92,6 +93,9 @@ The `pulp_streamer` and `goferd` services should be omitted if those services ar
 """
 
 
+TWEET_TEMPLATE = "Pulp {full_version}{beta_name_number} is available with {features_or_fixes} for {projects}. {upgrade_or_test} is recommended. Read more here: "
+
+
 REDMINE_URL = 'https://pulp.plan.io'
 
 
@@ -106,7 +110,24 @@ def parse_args():
     parser.add_argument('--version', type=x_y_z_version, help='The x.y.z version to create release notes for', required=True)
     parser.add_argument('--author', help='The full name of the author used in the blogpost.', required=True)
     parser.add_argument('--query-num', help='The number in the URL on Redmine that shows all issues for this release', type=int, required=True)
-    return parser.parse_args()
+    parser.add_argument('--beta', help='The Beta build number. Only set if it is a Beta build.', type=int)
+    args = parser.parse_args()
+
+    if args.version.endswith('0'):
+        args.features_or_fixes = 'new features'
+    else:
+        args.features_or_fixes = 'bugfixes'
+
+    if not 'beta' in args:
+        args.beta_or_stable = 'stable'
+        args.upgrade_or_test = 'Upgrading'
+        args.beta_name_number = ''
+    else:
+        args.beta_or_stable = 'testing'
+        args.upgrade_or_test = 'Beta testing'
+        args.beta_name_number = ' Beta {num}'.format(num=args.beta)
+
+    return args
 
 
 def print_announcements(args):
@@ -126,7 +147,10 @@ def print_announcements(args):
     project_str = ', '.join(projects[:-1]) + ', and {last_one}'.format(last_one=projects[-1])
     x_y_version = args.version.rpartition('.')[0]
     email_msg = EMAIL_TEMPLATE.format(issue_str=issue_str, projects=project_str,
-                                      full_version=args.version, x_y_version=x_y_version)
+                                      full_version=args.version, x_y_version=x_y_version,
+                                      beta_or_stable=args.beta_or_stable,
+                                      features_or_fixes=args.features_or_fixes,
+                                      beta_name_number=args.beta_name_number)
     print(email_msg)
 
     print('---------------------------------------------------\n')
@@ -137,9 +161,20 @@ def print_announcements(args):
         for issue in issues_by_project[project_name]:
             template_issue_str += '- {num}\t{subject}\n'.format(num=issue.id, subject=issue.subject)
     blog_msg = BLOG_POST_TEMPLATE.format(issue_str=template_issue_str, projects=project_str,
-                                         full_version=args.version, author=args.author)
+                                         full_version=args.version, author=args.author,
+                                         beta_or_stable=args.beta_or_stable,
+                                         features_or_fixes=args.features_or_fixes,
+                                         beta_name_number=args.beta_name_number)
 
     print(blog_msg)
+
+    print('---------------------------------------------------\n')
+
+    tweet_msg = TWEET_TEMPLATE.format(full_version=args.version, projects=project_str,
+                                      features_or_fixes=args.features_or_fixes,
+                                      upgrade_or_test=args.upgrade_or_test,
+                                      beta_name_number=args.beta_name_number)
+    print(tweet_msg)
 
 
 def main():
