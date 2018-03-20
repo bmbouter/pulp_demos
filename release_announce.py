@@ -118,7 +118,7 @@ def parse_args():
     else:
         args.features_or_fixes = 'bugfixes'
 
-    if not 'beta' in args:
+    if args.beta is None:
         args.beta_or_stable = 'stable'
         args.upgrade_or_test = 'Upgrading'
         args.beta_name_number = ''
@@ -159,7 +159,9 @@ def print_announcements(args):
     for project_name in projects:
         template_issue_str += '\n### ' + project_name + '\n'
         for issue in issues_by_project[project_name]:
-            template_issue_str += '- {num}\t{subject}\n'.format(num=issue.id, subject=issue.subject)
+            template_issue_str += '- [{num}\t{subject}]({url})\n'.format(num=issue.id,
+                                                                          subject=issue.subject,
+                                                                          url=issue.url)
     blog_msg = BLOG_POST_TEMPLATE.format(issue_str=template_issue_str, projects=project_str,
                                          full_version=args.version, author=args.author,
                                          beta_or_stable=args.beta_or_stable,

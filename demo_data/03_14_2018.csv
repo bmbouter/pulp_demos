@@ -1,0 +1,9 @@
+https://www.youtube.com/watch?v=B7etFmb94aY
+Community Update,bmbouter,0:35
+sync rich dependencies,milan,6:40,2.15.3
+SUSE Errata support,bizhang,11:12,2.16.0
+Changes to CI/Travis infrastructure (sqlite docs pulp_smash smoke tests for pulpcore and pulp_file),daviddavis,14:07,3.0
+Simpler install docs,bmbouter,17:58,3.0
+Multi-resource locking,daviddavis,21:49,3.0
+Sqlite as the default db,bmbouter,25:33,3.0
+Simplification of the pulp_file content API,daviddavis,30:20,3.0
