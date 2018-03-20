@@ -123,7 +123,7 @@ def parse_args():
         args.upgrade_or_test = 'Upgrading'
         args.beta_name_number = ''
     else:
-        args.beta_or_stable = 'testing'
+        args.beta_or_stable = 'beta'
         args.upgrade_or_test = 'Beta testing'
         args.beta_name_number = ' Beta {num}'.format(num=args.beta)
 
