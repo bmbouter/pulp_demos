@@ -111,6 +111,7 @@ def parse_args():
     parser.add_argument('--author', help='The full name of the author used in the blogpost.', required=True)
     parser.add_argument('--query-num', help='The number in the URL on Redmine that shows all issues for this release', type=int, required=True)
     parser.add_argument('--beta', help='The Beta build number. Only set if it is a Beta build.', type=int)
+    parser.add_argument('--rc', help='The RC build number. Only set if it is a RC build.', type=int)
     args = parser.parse_args()
 
     if args.version.endswith('0'):
@@ -118,14 +119,18 @@ def parse_args():
     else:
         args.features_or_fixes = 'bugfixes'
 
-    if args.beta is None:
+    if args.beta is None and args.rc is None:
         args.beta_or_stable = 'stable'
         args.upgrade_or_test = 'Upgrading'
         args.beta_name_number = ''
-    else:
+    elif args.beta is not None:
         args.beta_or_stable = 'beta'
         args.upgrade_or_test = 'Beta testing'
         args.beta_name_number = ' Beta {num}'.format(num=args.beta)
+    elif args.rc is not None:
+        args.beta_or_stable = 'beta'
+        args.upgrade_or_test = 'Release Candidate testing'
+        args.beta_name_number = ' Release Candidate {num}'.format(num=args.rc)
 
     return args
 
