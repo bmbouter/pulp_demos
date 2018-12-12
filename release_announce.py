@@ -5,11 +5,14 @@ It uses a query on pulp.plan.io to identify the issues in the release. This is r
 python-redmine client doesn't support filtering so another approach would require a full search of
 issues each time.
 
-Run it in a virtualenv and install the requirements file with something like:
+Run it in a virtualenv and install the requirements file:
+Set environment variable REDMINE_KEY to your Redmine API key.
+(You can find your API key on your account page when logged in, on the right-hand pane.)
 
 python3 -m venv announce_env
 source announce_env/bin/activate
 pip install -r requirements.txt
+export REDMINE_KEY=your_API_key_here
 python3 release_announce.py --help
 
 See the --help for more info on the arguments.
