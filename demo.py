@@ -115,7 +115,7 @@ Sections from the demo:
     print("""
 You can find the presenter IRC nicknames in the links above along with the version numbers they are being released in. You can ask questions via the mailing list or come chat on IRC.
 
-[0]: https://www.youtube.com/channel/UCI43Ffs4VPDv7awXvvBJfRQ
+[0]: https://www.youtube.com/PulpProject
 [1]: """)
 
 
@@ -130,7 +130,7 @@ author: {author}
 tags:
   - demo
 ---
-The Community Demo is available on the [Pulp YouTube Channel](https://www.youtube.com/channel/UCI43Ffs4VPDv7awXvvBJfRQ). See the agenda below.
+The Community Demo is available on the [Pulp YouTube Channel](https://www.youtube.com/PulpProject). See the agenda below.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/{youtube_slug}" frameborder="0" allowfullscreen></iframe>
 """.format(youtube_slug=youtube_slug, date=args.date, author=args.author))
