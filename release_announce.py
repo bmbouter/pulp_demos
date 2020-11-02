@@ -90,6 +90,11 @@ $ sudo systemctl start httpd pulp_workers pulp_resource_manager pulp_celerybeat 
 
 The `pulp_streamer` and `goferd` services should be omitted if those services are not installed.
 
+## Pulp 3
+
+Please consider upgrading your installation to Pulp3, as Pulp 2 is entering its end-of-life phase.
+You can find the [Migration Process](https://pulpproject.org/migrate-to-pulp-3/) directions on
+Pulp's documentation site!
 
 ## Issues Addressed
 {issue_str}
